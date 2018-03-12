@@ -1,0 +1,11 @@
+﻿input {
+	width: 50px;
+	border-radius: 4px;
+}
+#calculator {
+	border: 1px solid red;
+	padding: 5px;
+	margin:0 auto;
+	width: 50%;
+	min-width: 170px;
+}
