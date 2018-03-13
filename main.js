@@ -42,20 +42,34 @@
 		if(isItFit == true && howPiecesCanFit > skids) {
 			jQuery('#result').html('Влезет! разместим их так:<br> в ширину ' + piecesInWidth +' паллет <br>в длинну ' + piecesInLength + '<br> еще и останется свободного места на '+ (howPiecesCanFit - skids) +' подобных палет.');
 		} else if(isItFit == true){
-			jQuery('#result').html('Вместится, но займет весь трак.');
-		} else {
-			jQuery('#result').html('К сожалению, мы не можем это вместить ;(');
-		};
-		
-		
-		//jQuery('#result').html('площадь бокса: ' + Math.trunc((boxLength / 12) * (boxWidth / 12)) + '<br> палет в ширину: ' + piecesInWidth + '<br> Палет в длинну: ' + piecesInLength);
-		/*     // Math.ceil - округление в большую сторону
-		gipo = Math.sqrt((value1*value1)+(value2*value2));
-		 
-		value1 = parseInt(value1); 
-		value2 = parseInt(value2);
-		
-		jQuery('#result').html('gipotenusa is: ' + gipo );
-		*/
+        jQuery('#result').html('Вместится, но займет весь трак.');
+        } else if (isItFit == false){  // Если не влазит пробуем их запихнуть боком.
+			piecesInWidth = Math.trunc(boxWidth / skidsLength);				// сколько паллет влезет в ширину бокса боком.
+            piecesInLength = Math.ceil(skids/piecesInWidth);				// сколько прийдется занять рядов паллетами.
+            howPiecesCanFitInLength = Math.trunc(boxLength/skidsLength);	// сколько рядов может поместиться в трак.
+            howPiecesCanFit = (piecesInWidth * howPiecesCanFitInLength);	// сколько подобных паллет может поместиться в трак
+            isItFit = (howPiecesCanFit >= skids);
+
+            if(isItFit == true && howPiecesCanFit > skids) {
+                jQuery('#result').html('Поместится только ЕСЛИ ставить палеты БОКОМ!<br> разместим их так:<br> в ширину ' + piecesInWidth +' паллет <br>в длинну ' + piecesInLength + '<br> еще и останется свободного места на '+ (howPiecesCanFit - skids) +' подобных палет.');
+            } else if (isItFit == true){
+                jQuery('#result').html('Вместится только БОКОМ, и займет весь трак.');
+            } else {
+                jQuery('#result').html('К сожалению, мы не можем это вместить ;(');
+            }
+		}   /*else {
+            jQuery('#result').html('К сожалению, мы не можем это вместить ;(');
+        };*/
+
+
+        //jQuery('#result').html('площадь бокса: ' + Math.trunc((boxLength / 12) * (boxWidth / 12)) + '<br> палет в ширину: ' + piecesInWidth + '<br> Палет в длинну: ' + piecesInLength);
+        /*     // Math.ceil - округление в большую сторону
+        gipo = Math.sqrt((value1*value1)+(value2*value2));
+
+        value1 = parseInt(value1);
+        value2 = parseInt(value2);
+
+        jQuery('#result').html('gipotenusa is: ' + gipo );
+        */
 	})
 });
