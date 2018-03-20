@@ -1,75 +1,61 @@
 ﻿jQuery('document').ready(function() {
 	jQuery('#result').html('Подсказка:<br>Используй клавишу "TAB" для перехода между полями ввода и колесико мыши чтоб изменить значение внутри него.');
-	/* jQuery('body').append('<p>Hello! This is Append after complete document</p>');
-	jQuery('p').remove();
-	
-	var kat1=5,
-		kat2=7;
-	
-	alert(Math.floor(Math.sqrt((kat1*kat1) + (kat2*kat2))));
-	alert(5^1); */
-	jQuery('#calculator input').on('change or ready', function(){
-		//готовим место...
-		var boxLength, 						// длинна коробки трака
-			boxWidth, 						// ширина коробки трака
-			skids, 							// колличество паллет
-			skidsLength, 					// длинна паллеты
-			skidsWidth, 					// ширина паллеты
-			//howPiecesCanFitInWidth, 		// сколько вмещается паллет в ширину
+	jQuery('#calculator input').on('change', function(){
+		var truckBoxLength, 				// длинна коробки трака
+            truckBoxWidth, 					// ширина коробки трака
+            truckBoxHeight,					// высота коробки трака
+
+			pallets, 						// колличество паллет
+            stack, 							// Можно ли паллеты ставить друг на друга?
+			palletLength, 					// длинна паллеты
+			palletWidth, 					// ширина паллеты
+            palletHeight,					// высота паллеты
+
+			//howPiecesCanFitInWidth, 		// сколько паллет вмещается  в ширину
 			piecesInWidth,					// Сколько надо поставить палет в ширину
-			howPiecesCanFitInLength,		// Сколько вмещается паллет в длинну
+			howPiecesCanFitInLength,		// Сколько паллет вмещается в длинну
 			piecesInLength,					// Сколько надо поставить паллет в длинну
-			howPiecesCanFit,
+			howPiecesCanFit,				// Сколько всего палет может вместиться в грузовик
 			isItFit;						// Вмещается ли груз в трак?
 		
 		
-		// Собираем информацию.
-		boxLength = jQuery('#boxLength').val();
-		boxWidth = jQuery('#boxWidth').val();
-		skids = jQuery('#skids').val();
-		skidsLength = jQuery('#skidsLength').val();
-		skidsWidth = jQuery('#skidsWidth').val();
+		// Забираем информацию с формы.
+		truckBoxLength = jQuery('#truckBoxLength').val();
+		truckBoxWidth = jQuery('#truckBoxWidth').val();
+		truckBoxHeight = jQuery('#truckBoxHeight').val();
+		pallets = jQuery('#pallets').val();
+        isStack = jQuery('#stackable').val();
+		palletLength = jQuery('#palletLength').val();
+		palletWidth = jQuery('#palletWidth').val();
+        palletHeight = jQuery('#palletHeight').val();
+
 		
-		
-		// Анализируем её...
-		piecesInWidth = Math.trunc(boxWidth / skidsWidth); // сколько паллет влезет в ширину бокса.
-		piecesInLength = Math.ceil(skids/piecesInWidth);  // сколько прийдется занять рядов паллетами.
-		howPiecesCanFitInLength = Math.trunc(boxLength/skidsLength); // сколько рядов может поместиться в трак.
+		// Высчитываем необходимые переменные...
+		piecesInWidth = Math.trunc(truckBoxWidth / palletWidth); // сколько паллет влезет в ширину бокса.
+		piecesInLength = Math.ceil(pallets/piecesInWidth);  // сколько прийдется занять рядов паллетами.
+		howPiecesCanFitInLength = Math.trunc(truckBoxLength/palletLength); // сколько рядов может поместиться в трак.
 		howPiecesCanFit = (piecesInWidth * howPiecesCanFitInLength); // сколько подобных паллет может поместиться в трак
-		isItFit = (howPiecesCanFit >= skids);
+		isItFit = (howPiecesCanFit >= pallets);
 		
 		//Проверяем условия.
-		if(isItFit == true && howPiecesCanFit > skids) {
-			jQuery('#result').html('Влезет! разместим их так:<br> в ширину ' + piecesInWidth +' паллет <br>в длинну ' + piecesInLength + '<br> еще и останется свободного места на '+ (howPiecesCanFit - skids) +' подобных палет.');
+		if(isItFit == true && howPiecesCanFit > pallets) {
+			jQuery('#result').html('Влезет! разместим их так:<br> в ширину <b>' + piecesInWidth +'</b> паллет <br>в длинну <b>' + piecesInLength + '</b><br> еще и останется свободного места на <b>'+ (howPiecesCanFit - pallets) +'</b> подобных палет.');
 		} else if(isItFit == true){
         jQuery('#result').html('Вместится, но займет весь трак.');
         } else if (isItFit == false){  // Если не влазит пробуем их запихнуть боком.
-			piecesInWidth = Math.trunc(boxWidth / skidsLength);				// сколько паллет влезет в ширину бокса боком.
-            piecesInLength = Math.ceil(skids/piecesInWidth);				// сколько прийдется занять рядов паллетами.
-            howPiecesCanFitInLength = Math.trunc(boxLength/skidsLength);	// сколько рядов может поместиться в трак.
+			piecesInWidth = Math.trunc(truckBoxWidth / palletLength);				// сколько паллет влезет в ширину бокса боком.
+            piecesInLength = Math.ceil(pallets/piecesInWidth);				// сколько прийдется занять рядов паллетами.
+            howPiecesCanFitInLength = Math.trunc(truckBoxLength/palletLength);	// сколько рядов может поместиться в трак.
             howPiecesCanFit = (piecesInWidth * howPiecesCanFitInLength);	// сколько подобных паллет может поместиться в трак
-            isItFit = (howPiecesCanFit >= skids);
+            isItFit = (howPiecesCanFit >= pallets);
 
-            if(isItFit == true && howPiecesCanFit > skids) {
-                jQuery('#result').html('Поместится только ЕСЛИ ставить палеты БОКОМ!<br> разместим их так:<br> в ширину ' + piecesInWidth +' паллет <br>в длинну ' + piecesInLength + '<br> еще и останется свободного места на '+ (howPiecesCanFit - skids) +' подобных палет.');
+            if(isItFit == true && howPiecesCanFit > pallets) {
+                jQuery('#result').html('Поместится только ЕСЛИ ставить палеты БОКОМ!<br> разместим их так:<br> в ширину ' + piecesInWidth +' паллет <br>в длинну ' + piecesInLength + '<br> еще и останется свободного места на '+ (howPiecesCanFit - pallets) +' подобных палет.');
             } else if (isItFit == true){
                 jQuery('#result').html('Вместится только БОКОМ, и займет весь трак.');
             } else {
                 jQuery('#result').html('К сожалению, мы не можем это вместить ;(');
             }
-		}   /*else {
-            jQuery('#result').html('К сожалению, мы не можем это вместить ;(');
-        };*/
-
-
-        //jQuery('#result').html('площадь бокса: ' + Math.trunc((boxLength / 12) * (boxWidth / 12)) + '<br> палет в ширину: ' + piecesInWidth + '<br> Палет в длинну: ' + piecesInLength);
-        /*     // Math.ceil - округление в большую сторону
-        gipo = Math.sqrt((value1*value1)+(value2*value2));
-
-        value1 = parseInt(value1);
-        value2 = parseInt(value2);
-
-        jQuery('#result').html('gipotenusa is: ' + gipo );
-        */
+		}
 	})
 });
