@@ -1,6 +1,6 @@
-﻿jQuery('document').ready(function() {
-    jQuery('#result').html('Подсказка:<br>Используй клавишу "TAB" для перехода между полями ввода и колесико мыши чтоб изменить значение внутри него.');
-    jQuery('#calculator input').on("change", function(){
+﻿$('document').ready(function() {
+    $('#result').html('Подсказка:<br>Используй клавишу "TAB" для перехода между полями ввода и колесико мыши чтоб изменить значение внутри него.');
+    $('#calculator input').on("change", function(){
         var truckBoxLength, 				// длинна коробки трака
             truckBoxWidth, 					// ширина коробки трака
             truckBoxHeight,					// высота коробки трака
@@ -11,51 +11,58 @@
             palletWidth, 					// ширина паллеты
             palletHeight,					// высота паллеты
 
-            //howPiecesCanFitInWidth, 		// сколько паллет вмещается  в ширину
             piecesInWidth,					// Сколько надо поставить палет в ширину
             howPiecesCanFitInLength,		// Сколько паллет вмещается в длинну
             piecesInLength,					// Сколько надо поставить паллет в длинну
             howPiecesCanFit,				// Сколько всего палет может вместиться в грузовик
-            isItFit;						// Вмещается ли груз в трак?
+            isItFit,						// Вмещается ли груз в трак?
+            isStackFit;                     // Вмещается ли груз стаком?
         
             
         function getCargoInfo(){			// Забираем информацию с формы.
-        truckBoxLength = jQuery('#truckBoxLength').val();
-        truckBoxWidth = jQuery('#truckBoxWidth').val();
-        truckBoxHeight = jQuery('#truckBoxHeight').val();
-        pallets = jQuery('#pallets').val();
-        isStack = jQuery('#stackable').val();
-        palletLength = jQuery('#palletLength').val();
-        palletWidth = jQuery('#palletWidth').val();
-        palletHeight = jQuery('#palletHeight').val();
+            truckBoxLength = +($('#truckBoxLength').val());
+            truckBoxWidth = +($('#truckBoxWidth').val());
+            truckBoxHeight = +($('#truckBoxHeight').val());
+            palletLength = +($('#palletLength').val());
+            palletWidth = +($('#palletWidth').val());
+            palletHeight = +($('#palletHeight').val());
+            pallets = +($('#pallets').val());
+            isStack = $('#stackable').is(":checked");
+        }
+        function countCargoSize(sideA,sideB){ //at first sideA should be longer that sideB
+            piecesInWidth = Math.trunc(truckBoxWidth / sideB);// сколько паллет влезет в ширину бокса боком.
+            piecesInLength = Math.ceil(pallets/piecesInWidth);// сколько рядов займет груз.
+
+            howPiecesCanFitInLength = Math.trunc(truckBoxLength/sideA);// сколько рядов может поместиться в трак.
+            howPiecesCanFitInHeight = Math.trunc(truckBoxHeight/palletHeight);//сколько паллет вместится в высоту.
+
+            howPiecesCanFit = (piecesInWidth * howPiecesCanFitInLength);// сколько подобных паллет может поместиться в трак
+            howPiecesCanFitIfStack = (howPiecesCanFit*howPiecesCanFitInHeight);
+
+            isItFit = (howPiecesCanFit >= pallets & truckBoxHeight >= palletHeight);
+            isStackFit = (howPiecesCanFitIfStack >= pallets);
         }
         getCargoInfo();
-        
-        // Высчитываем необходимые переменные...
-        piecesInWidth = Math.trunc(truckBoxWidth / palletWidth); // сколько паллет влезет в ширину бокса.
-        piecesInLength = Math.ceil(pallets/piecesInWidth);  // сколько прийдется занять рядов паллетами.
-        howPiecesCanFitInLength = Math.trunc(truckBoxLength/palletLength); // сколько рядов может поместиться в трак.
-        howPiecesCanFit = (piecesInWidth * howPiecesCanFitInLength); // сколько подобных паллет может поместиться в трак
-        isItFit = (howPiecesCanFit >= pallets && truckBoxHeight > palletHeight);
+        countCargoSize(palletLength,palletWidth);
         
         //Проверяем условия.
-        if(isItFit == true & howPiecesCanFit > pallets) {
-            jQuery('#result').html('Влезет! разместим их так:<br> в ширину <b>' + piecesInWidth +'</b> паллет <br>в длинну <b>' + piecesInLength + '</b><br> еще и останется свободного места на <b>'+ (howPiecesCanFit - pallets) +'</b> подобных палет.');
-        } else if(isItFit == true){
-            jQuery('#result').html('Вместится, но займет весь трак.');
-        } else if(isItFit == false){  // Если не влазит пробуем их запихнуть боком.
-            piecesInWidth = Math.trunc(truckBoxWidth / palletLength);				// сколько паллет влезет в ширину бокса боком.
-            piecesInLength = Math.ceil(pallets/piecesInWidth);				// сколько прийдется занять рядов паллетами.
-            howPiecesCanFitInLength = Math.trunc(truckBoxLength/palletWidth);	// сколько рядов может поместиться в трак.
-            howPiecesCanFit = (piecesInWidth * howPiecesCanFitInLength);	// сколько подобных паллет может поместиться в трак
-            isItFit = (howPiecesCanFit >= pallets  & truckBoxHeight > palletHeight);
+        if(isItFit & howPiecesCanFit > pallets) {
+            $('#result').html('Влезет! разместим их так:<br> в ширину <b>' + piecesInWidth +'</b> паллет <br>в длинну <b>' + piecesInLength + '</b><br> еще и останется свободного места на <b>'+ (howPiecesCanFit - pallets) +'</b> подобных палет.');
+        } else if(isItFit){
+            $('#result').html('Вместится, но займет весь трак.');
+        } else if(isStack & howPiecesCanFitIfStack >= pallets){
+            $('#result').html('Влезет только <b>ЕСЛИ</b> ставить палеты <b>"одну на другую."</b>');
+        } else if(!isItFit){  // Если не влазит пробуем их запихнуть боком.
+            countCargoSize(palletWidth,palletLength);
 
-            if(isItFit == true && howPiecesCanFit > pallets) {
-                jQuery('#result').html('Поместится только ЕСЛИ ставить палеты БОКОМ!<br> разместим их так:<br> в ширину ' + piecesInWidth +' паллет <br>в длинну ' + piecesInLength + '<br> еще и останется свободного места на '+ (howPiecesCanFit - pallets) +' подобных палет.');
-            } else if (isItFit == true){
-                jQuery('#result').html('Вместится только БОКОМ, и займет весь трак.');
-            } else {
-                jQuery('#result').html('К сожалению, мы НИКАК не можем это вместить ;(');
+            if(isItFit & howPiecesCanFit > pallets) {
+                $('#result').html('Поместится <b>ЕСЛИ</b> ставить палеты <b>БОКОМ!</b> разместим их так:<br> в ширину <b>' + piecesInWidth +'</b> паллет <br>в длинну <b>' + piecesInLength + '</b><br> еще и останется свободного места на <b>'+ (howPiecesCanFit - pallets) +'</b> подобных палет.');
+            } else if (isItFit){
+                $('#result').html('Вместится <b>БОКОМ</b> и займет весь трак.');
+            } else if(isStack & howPiecesCanFitIfStack >= pallets){
+                $('#result').html('Влезет только <b>ЕСЛИ</b> ставить палеты <b>"одну на другую"</b> и то <b>БОКОМ</b>');
+            } else {    
+                $('#result').html('К сожалению, мы <b>НИКАК</b> не можем это вместить ;(');
             }
         }
     })
